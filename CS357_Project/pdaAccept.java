@@ -8,7 +8,7 @@ public class pdaAccept {
 	static Queue<state> states = new LinkedList<state>();
 
 	public static void main(String[] args) {
-		File text = new File("/Users/dylandegrood/Documents/GitHub/CS357_Project/CS357_Project/CS352_Proj/src/input.txt");
+		File text = new File("/Users/dylandegrood/Documents/GitHub/CS357_PDA/CS357_Project/input.txt");
 
 		int totalStates;
 		String[] alphabet;
@@ -68,10 +68,11 @@ public class pdaAccept {
             inputString = scanner.nextLine();
             //Setting up first state
             tempState = new state(transitions, inputString, startState);
-            states.add(tempState);
+			states.add(tempState);
+
+			scanner.close();
 	        
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
