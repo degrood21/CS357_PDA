@@ -3,6 +3,7 @@ import java.util.*;
 public class state {
 	
 	ArrayList<transition> transitions = new ArrayList<>();
+	Stack<String> currStack = new Stack<>();
 	private String currInput;
 	private int currState;
 	
@@ -12,10 +13,14 @@ public class state {
 		currState = -1;
 	}
 	
-	state(ArrayList<transition> trans, String input, int state){
+	state(ArrayList<transition> trans, String input, int state, Stack<String> stack){
 		transitions = trans;
 		currInput = input;
 		currState = state;
+		for(int i = 0; i < stack.size(); i++){
+			String temp = stack.pop();
+			currStack.push(temp);
+		}
 	}
 	
 	public int getState() {
