@@ -27,8 +27,16 @@ public class state {
 		return this.currState;
 	}
 	
-	public String getInput() {
+	public String getInput(){
 		return this.currInput;
+	}
+
+	public void setState(int state){
+		currState = state;
+	}
+
+	public void setInput(String input){
+		currInput = input;
 	}
 
 }

@@ -67,7 +67,7 @@ public class pdaAccept {
 			System.out.println("Please Input String to Test: ");
             inputString = scanner.nextLine();
 			//Setting up first state
-			stack.push("$");
+			//stack.push("$");
             beginState = new state(transitions, inputString, startState,stack);
 			states.add(beginState);
 
@@ -77,16 +77,127 @@ public class pdaAccept {
 			e.printStackTrace();
 		}
 		
-		
-		
+		checkString();
+		if(accept){
+			System.out.println("String was Accepted!");
+		}
+		else {
+			System.out.println("String was NOT Accepted!");
+		}
+
 	}
 
-	public boolean checkString() {
+	public static void checkString() {
 		
 		while(!done){
 			state toLook = states.remove();
 
-			if(toLook.getInput().isEmpty()){
+			/**
+			 * BUG:
+			 * BREAKS IF MORE 1's than 0's afterwards
+			 * So like 00111 should not accept, but it breaks because it continues
+			 * The language of the current PDA is 0^n 1^n
+			 */
+
+			//for loop through the transitions
+			//for each transition we can do based off of toLook state
+			//create new state and add to queue
+			for (transition currTransition : toLook.transitions) {
+				if(toLook.getState() == currTransition.getCurr()){
+					//will be in here if current state matches current state
+					//of transition
+
+					if(toLook.getInput().matches("")){
+						if(currTransition.getInput().matches("e")){
+							if(currTransition.getPop().matches("e")){
+								String tempInput = toLook.getInput();
+								state tempState = new state();
+								tempState.currStack = toLook.currStack;
+								tempState.currStack.push(currTransition.getPush());
+								tempState.setInput(tempInput);
+								tempState.setState(currTransition.getDest());
+								tempState.transitions = toLook.transitions;
+								states.add(tempState);
+							}
+							else if(currTransition.getPush().matches("e")){
+								if(currTransition.getPop().equals(toLook.currStack.peek())){
+									String tempInput = toLook.getInput();
+									state tempState = new state();
+									tempState.currStack = toLook.currStack;
+									tempState.currStack.pop();
+									tempState.setInput(tempInput);
+									tempState.setState(currTransition.getDest());
+									tempState.transitions = toLook.transitions;
+									states.add(tempState);
+								}
+							}
+						}
+						else{
+							continue;
+						}
+						
+					}
+					else if(currTransition.getInput().matches(toLook.getInput().substring(0, 1))){
+						//will be here is for example read a '0' and input for
+						//transition is '0'
+						if(currTransition.getPop().matches("e")){
+							String tempInput = toLook.getInput().substring(1,toLook.getInput().length());
+							state tempState = new state();
+							tempState.currStack = toLook.currStack;
+							tempState.currStack.push(currTransition.getPush());
+							tempState.setInput(tempInput);
+							tempState.setState(currTransition.getDest());
+							tempState.transitions = toLook.transitions;
+							states.add(tempState);
+						}
+						else if(currTransition.getPush().matches("e")){
+							if(currTransition.getPop().matches(toLook.currStack.peek())){
+								String tempInput = toLook.getInput().substring(1,toLook.getInput().length());
+								state tempState = new state();
+								tempState.currStack = toLook.currStack;
+								tempState.currStack.pop();
+								tempState.setInput(tempInput);
+								tempState.setState(currTransition.getDest());
+								tempState.transitions = toLook.transitions;
+								states.add(tempState);
+							}
+						}
+						
+					}
+					else if(currTransition.getInput().matches("e")){
+						//will be here if the transition is empty
+						//check pop or push and do that
+						//set currState
+						//add that new state to queue
+						if(currTransition.getPop().matches("e")){
+							String tempInput = toLook.getInput();
+							state tempState = new state();
+							tempState.currStack = toLook.currStack;
+							tempState.currStack.push(currTransition.getPush());
+							tempState.setInput(tempInput);
+							tempState.setState(currTransition.getDest());
+							tempState.transitions = toLook.transitions;
+							states.add(tempState);
+						}
+						else if(currTransition.getPush().matches("e")){
+							if(currTransition.getPop().matches(toLook.currStack.peek())){
+								String tempInput = toLook.getInput();
+								state tempState = new state();
+								tempState.currStack = toLook.currStack;
+								tempState.currStack.pop();
+								tempState.setInput(tempInput);
+								tempState.setState(currTransition.getDest());
+								tempState.transitions = toLook.transitions;
+								states.add(tempState);
+							}
+						}
+
+					}
+					
+				}
+			}
+
+			if(toLook.getInput().matches("")){
 				//check to see if in finished state, set accept to true if yes
 				//and done to true
 				for(int i = 0; i < endStates.length; i++){
@@ -106,22 +217,9 @@ public class pdaAccept {
 				done = true;
 			}
 
-			//for loop through the transitions
-			//for each transition we can do based off of toLook state
-			//create new state and add to queue
-			for (transition currTransition : toLook.transitions) {
-				if(toLook.getState() == currTransition.getCurr()){
-					if(currTransition.getInput() == toLook.getInput().substring(0, 1)){
-						
-					}
-					
-					//state tempState = new state(toLook.transitions, input, state, stack)
-				}
-			}
-
 		}
 
-		return accept;
+		//return accept;
 	}
 
 }
