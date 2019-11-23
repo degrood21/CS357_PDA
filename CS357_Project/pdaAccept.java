@@ -96,6 +96,7 @@ public class pdaAccept {
 			 * BUG:
 			 * BREAKS IF MORE 1's than 0's afterwards
 			 * So like 00111 should not accept, but it breaks because it continues
+			 * And if 1's are before 0's so probably also if its a mix of 1's and 0's
 			 * The language of the current PDA is 0^n 1^n
 			 */
 
