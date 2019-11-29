@@ -1,3 +1,15 @@
+/**
+ * pdaAccept.java
+ * 
+ * Authors: Dylan DeGrood, Mikey Antkiewicz
+ * 
+ * Takes in an input file with a PDA description
+ * and asks user for input string and runs that string
+ * with the PDA description and returns whether or not
+ * it accepts or rejects
+ * 
+ */
+
 import java.io.*;
 import java.util.*;
 
@@ -9,7 +21,7 @@ public class pdaAccept {
 	static String[] endStates;
 
 	public static void main(String[] args) {
-		File text = new File("/Users/dylandegrood/Documents/GitHub/CS357_PDA/CS357_Project/input3.txt");
+		File text = new File("/Users/dylandegrood/Documents/GitHub/CS357_PDA/CS357_Project/input.txt");
 
 		int totalStates;
 		String[] alphabet;
@@ -27,35 +39,114 @@ public class pdaAccept {
 			// Reading each line of file using Scanner class
 
 			totalStates = scnr.nextInt();
-			// System.out.println(totalStates);
+
 			scnr.nextLine();
 
 			alphabet = scnr.nextLine().split(" ");
 
 			stackAlphabet = scnr.nextLine().split(" ");
-			// for (int i = 0; i < stackAlphabet.length; i++) {
-			// System.out.println("" + stackAlphabet[i]);
-			// }
 
 			startState = scnr.nextInt();
+			// Error check the input of start state
+			// Throws Exception for strings at declaration above
+			// otherwise if its not a number in scope throw our own error
+			if(startState > totalStates-1 || startState < 0){
+				System.out.println();
+				System.out.println("ERROR:");
+				System.out.println("Start State is Incorrect");
+				System.out.println("See Format of Input File and Reformat");
+				System.out.println();
+				scnr.close();
+				return;
+			}
 			scnr.nextLine();
 
 			endStates = scnr.nextLine().split(" ");
-			// for (int i = 0; i < endStates.length; i++) {
-			// System.out.println("" + endStates[i]);
-			// }
+			// Error check the end states
+			// Throws Exception for strings at declaration above
+			// otherwise if its not a number in scope throw our own error
+			for(int i = 0; i < endStates.length; i++){
+				if(Integer.parseInt(endStates[i]) > totalStates-1 || Integer.parseInt(endStates[i]) < 0){
+					System.out.println();
+					System.out.println("ERROR:");
+					System.out.println("Incorrect End States");
+					System.out.println("See Format of Input File and Reformat");
+					System.out.println();
+					scnr.close();
+					return;
+				}
+			}
 
-			int lineNumber = 1;
 			while (scnr.hasNextLine()) {
 
 				String line = scnr.nextLine();
-				System.out.println("line " + lineNumber + " :" + line);
-				lineNumber++;
 
 				tempTrans = line.split(" ");
-
+				// Test check to see if the transition line
+				// has all needed characters
+				if(tempTrans.length != 5){
+					System.out.println();
+					System.out.println("ERROR:");
+					System.out.println("Incorrect Length of Transition");
+					System.out.println("See Format of Input File and Reformat");
+					System.out.println();
+					scnr.close();
+					return;
+				}
+				// Next 2 for loops check whether input transition
+				// char is a valid alphabet char and the push and
+				// pop char are a valid stack alphabet all according
+				// to the language
+				int notAlphabetFault = 0;
+				int notStackFault = 0;
+				for(int i = 0; i < alphabet.length; i++){
+					if(alphabet[i].equals(tempTrans[1])){
+						notAlphabetFault++;
+					}
+					else if(tempTrans[1].equals("e") && notAlphabetFault != 1){
+						notAlphabetFault++;
+					}
+				}
+				for(int i = 0; i < stackAlphabet.length; i++){
+					if (stackAlphabet[i].equals(tempTrans[2])) {
+						notStackFault++;
+					} 
+					else if (tempTrans[2].equals("e") && notStackFault != 1) {
+						notStackFault++;
+					}
+					if (stackAlphabet[i].equals(tempTrans[4])) {
+						notStackFault++;
+					} 
+					else if (tempTrans[4].equals("e") && notAlphabetFault != 2) {
+						notStackFault++;
+					}
+				}
+				// throws the error if transition alphabet or stack fault
+				if(notAlphabetFault == 0 || notStackFault < 2){
+					System.out.println();
+					System.out.println("ERROR:");
+					System.out.println("Incorrect Alphabet/Stack Character in Transition");
+					System.out.println("See Format of Input File and Reformat");
+					System.out.println();
+					scnr.close();
+					return;
+				}
+				// Checking to see if the currState/destState of the transition is
+				// within the total amount of states allowed
+				if (Integer.parseInt(tempTrans[0]) > totalStates - 1 || Integer.parseInt(tempTrans[0]) < 0
+						|| Integer.parseInt(tempTrans[3]) > totalStates - 1 || Integer.parseInt(tempTrans[3]) < 0) {
+					System.out.println();
+					System.out.println("ERROR:");
+					System.out.println("Incorrect Current State or Destination State in Transition");
+					System.out.println("See Format of Input File and Reformat");
+					System.out.println();
+					scnr.close();
+					return;
+				}
 				transition temp = new transition(Integer.parseInt(tempTrans[0]), tempTrans[1], tempTrans[2],
 						Integer.parseInt(tempTrans[3]), tempTrans[4]);
+				// tempTrans[0] currState, tempTrans[1] input, tempTrans[2] Pop char
+				// tempTrans[3] destState, tempTrans[4] Push char
 
 				transitions.add(temp);
 
@@ -67,9 +158,8 @@ public class pdaAccept {
 			System.out.println("Please Input String to Test: ");
 			inputString = scanner.nextLine();
 			// Setting up first state
-			// stack.push("$");
 			beginState = new state(transitions, inputString, startState, stack);
-			states.add(beginState);
+			states.add(beginState);// adds the first state
 
 			scanner.close();
 
@@ -77,6 +167,9 @@ public class pdaAccept {
 			e.printStackTrace();
 		}
 
+		// Calls the method to check the string by going through
+		// the transitions and the stack nondeterministically
+		// choosing all paths to see if one accepts
 		checkString();
 		if (accept) {
 			System.out.println("String was ACCEPTED!");
@@ -86,6 +179,7 @@ public class pdaAccept {
 
 	}
 
+	// Sets accept true if there was one path that accepted
 	public static void checkString() {
 
 		while (!done) {
@@ -96,8 +190,6 @@ public class pdaAccept {
 			// create new state and add to queue
 			for (transition currTransition : toLook.transitions) {
 				if (toLook.getState() == currTransition.getCurr()) {
-					// will be in here if current state matches current state
-					// of transition
 
 					if (toLook.getInput().matches("")) {
 						if (currTransition.getInput().matches("e")) {
@@ -215,7 +307,6 @@ public class pdaAccept {
 
 		}
 
-		// return accept;
 	}
 
 }

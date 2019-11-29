@@ -1,4 +1,16 @@
-
+/**
+ * transition.java
+ * 
+ * Authors: Dylan DeGrood, Mikey Antkiewicz
+ * 
+ * Object class for each transition needed for a given PDA
+ * Needs a current state, destination state, input for the char
+ * needed to be read, and whether or not to pop or push a char
+ * from/on the stack
+ * 
+ * "e" is used to denote nothing or empty
+ * 
+ */
 public class transition {
 	int currState;
 	String input;

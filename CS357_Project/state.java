@@ -1,3 +1,15 @@
+/**
+ * state.java
+ * 
+ * Authors: Dylan DeGrood, Mikey Antkiewicz
+ * 
+ * Object class that holds everything needed to describe
+ * a current state of where one is in a PDA including
+ * the current stack, current string that is being read,
+ * and the current state that user is in
+ * 
+ */
+
 import java.util.*;
 
 public class state {
