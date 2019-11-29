@@ -21,7 +21,7 @@ public class pdaAccept {
 	static String[] endStates;
 
 	public static void main(String[] args) {
-		File text = new File("/Users/dylandegrood/Documents/GitHub/CS357_PDA/CS357_Project/input.txt");
+		File text = new File("/Users/dylandegrood/Documents/GitHub/CS357_PDA/CS357_Project/input3.txt");
 
 		int totalStates;
 		String[] alphabet;
@@ -245,7 +245,6 @@ public class pdaAccept {
 							String tempInput = toLook.getInput().substring(1, toLook.getInput().length());
 							state tempState = new state();
 							tempState.currStack = (Stack<String>) toLook.currStack.clone();
-							//tempState.currStack.push(currTransition.getPush());
 							tempState.setInput(tempInput);
 							tempState.setState(currTransition.getDest());
 							tempState.transitions = toLook.transitions;
@@ -257,7 +256,7 @@ public class pdaAccept {
 						// check pop or push and do that
 						// set currState
 						// add that new state to queue
-						if (currTransition.getPop().matches("e")) {
+						if (currTransition.getPop().matches("e") && !currTransition.getPush().matches("e")) {
 							String tempInput = toLook.getInput();
 							state tempState = new state();
 							tempState.currStack = (Stack<String>) toLook.currStack.clone();
@@ -266,7 +265,7 @@ public class pdaAccept {
 							tempState.setState(currTransition.getDest());
 							tempState.transitions = toLook.transitions;
 							states.add(tempState);
-						} else if (currTransition.getPush().matches("e")) {
+						} else if (currTransition.getPush().matches("e") && !currTransition.getPop().matches("e")) {
 							if (currTransition.getPop().matches(toLook.currStack.peek())) {
 								String tempInput = toLook.getInput();
 								state tempState = new state();
@@ -277,6 +276,14 @@ public class pdaAccept {
 								tempState.transitions = toLook.transitions;
 								states.add(tempState);
 							}
+						} else if (currTransition.getPush().matches("e") && currTransition.getPop().matches("e")){
+							String tempInput = toLook.getInput();
+							state tempState = new state();
+							tempState.currStack = (Stack<String>) toLook.currStack.clone();
+							tempState.setInput(tempInput);
+							tempState.setState(currTransition.getDest());
+							tempState.transitions = toLook.transitions;
+							states.add(tempState);
 						}
 
 					}
